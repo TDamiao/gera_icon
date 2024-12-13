@@ -153,8 +153,86 @@
         });
 
         function downloadImage() {
-            // Lógica de download
-        }
+    const width = parseInt(document.getElementById('width').value, 10);
+    const height = parseInt(document.getElementById('height').value, 10);
+    const format = document.getElementById('format').value;
+    const text = document.getElementById('text').value;
+    const textColor = document.getElementById('textColor').value;
+    const font = document.getElementById('font').value;
+    const borderWidth = parseInt(document.getElementById('borderWidth').value, 10);
+    const borderColor = document.getElementById('borderColor').value;
+    const circleBackground = document.getElementById('circleBackground').value;
+
+    const fontSize = Math.min(width, height) / 3; // Ajusta o tamanho da fonte proporcionalmente
+
+    if (format === 'svg') {
+        downloadImageAsSVG(width, height, fontSize, text, textColor, font, borderWidth, borderColor, circleBackground);
+    } else if (format === 'png') {
+        downloadImageAsPNG(width, height, fontSize, text, textColor, font, borderWidth, borderColor, circleBackground);
+    }
+}
+
+function downloadImageAsSVG(width, height, fontSize, text, textColor, font, borderWidth, borderColor, circleBackground) {
+    const svgNamespace = "http://www.w3.org/2000/svg";
+
+    const svg = `
+        <svg xmlns="${svgNamespace}" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+            <circle cx="${width / 2}" cy="${height / 2}" r="${Math.min(width, height) / 2 - borderWidth}" 
+                fill="${circleBackground}" stroke="${borderColor}" stroke-width="${borderWidth}" />
+            <text x="50%" y="50%" dy=".3em" text-anchor="middle" font-size="${fontSize}" 
+                font-family="${font}" fill="${textColor}" font-weight="bold">${text}</text>
+        </svg>
+    `;
+
+    const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "circle_fpa.svg";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+}
+
+
+function downloadImageAsPNG(width, height, fontSize, text, textColor, font, borderWidth, borderColor, circleBackground) {
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+
+    // Fundo do círculo
+    ctx.fillStyle = circleBackground;
+    ctx.beginPath();
+    ctx.arc(width / 2, height / 2, Math.min(width, height) / 2 - borderWidth, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fill();
+
+    // Borda do círculo
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = borderWidth;
+    ctx.stroke();
+
+    // Texto centralizado
+    ctx.fillStyle = textColor;
+    ctx.font = `bold ${fontSize}px ${font}`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, width / 2, height / 2);
+
+    // Converter para PNG e baixar
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = "circle_fpa.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
     </script>
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
