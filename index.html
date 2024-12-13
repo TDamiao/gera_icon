@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circulo FPA</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: transparent;
+        }
+
+        .circle {
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, #228B22 60%, #006400);
+            border: 3px solid #003300;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .controls-row label,
+        .controls-row input,
+        .controls-row select {
+            margin: 5px;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        .download button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #006400;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .download button:hover {
+            background-color: #003300;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <div class="controls-row">
+            <label for="width">Largura (px):</label>
+            <input type="number" id="width" value="150" min="10">
+            <label for="height">Altura (px):</label>
+            <input type="number" id="height" value="150" min="10">
+            <label>
+                <input type="checkbox" id="keepAspectRatio" checked>
+                Manter proporção
+            </label>
+        </div>
+
+        <div class="controls-row">
+            <label for="text">Texto:</label>
+            <input type="text" id="text" value="FPA">
+            <label for="textColor">Cor do Texto:</label>
+            <input type="color" id="textColor" value="#FFFFFF">
+            <label for="font">Fonte:</label>
+            <select id="font">
+                <option value="Arial" selected>Arial</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Tahoma">Tahoma</option>
+                <option value="Courier New">Courier New</option>
+            </select>
+        </div>
+
+        <div class="controls-row">
+            <label for="borderWidth">Espessura da Borda (px):</label>
+            <input type="number" id="borderWidth" value="3" min="1">
+            <label for="borderColor">Cor da Borda:</label>
+            <input type="color" id="borderColor" value="#003300">
+            <label for="circleBackground">Cor de Fundo:</label>
+            <input type="color" id="circleBackground" value="#228B22">
+        </div>
+
+        <div class="controls-row">
+            <label for="format">Formato:</label>
+            <select id="format">
+                <option value="svg" selected>SVG</option>
+                <option value="png">PNG</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="circle" id="circle"><span style="font-family: Arial, sans-serif;">FPA</span></div>
+
+    <div class="download">
+        <button onclick="downloadImage()">Baixar Imagem</button>
+    </div>
+
+    <script>
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        const keepAspectRatioCheckbox = document.getElementById('keepAspectRatio');
+        const textInput = document.getElementById('text');
+        const textColorInput = document.getElementById('textColor');
+        const fontSelect = document.getElementById('font');
+        const borderWidthInput = document.getElementById('borderWidth');
+        const borderColorInput = document.getElementById('borderColor');
+        const circleBackgroundInput = document.getElementById('circleBackground');
+        const formatSelect = document.getElementById('format');
+        const circleElement = document.getElementById('circle');
+        const textElement = circleElement.querySelector('span');
+
+        widthInput.addEventListener('input', () => {
+            if (keepAspectRatioCheckbox.checked) {
+                const aspectRatio = 150 / 150;
+                heightInput.value = Math.round(widthInput.value / aspectRatio);
+            }
+        });
+
+        heightInput.addEventListener('input', () => {
+            if (keepAspectRatioCheckbox.checked) {
+                const aspectRatio = 150 / 150;
+                widthInput.value = Math.round(heightInput.value * aspectRatio);
+            }
+        });
+
+        textInput.addEventListener('input', () => {
+            textElement.textContent = textInput.value;
+        });
+
+        textColorInput.addEventListener('input', () => {
+            textElement.style.color = textColorInput.value;
+        });
+
+        fontSelect.addEventListener('change', () => {
+            textElement.style.fontFamily = fontSelect.value;
+        });
+
+        borderWidthInput.addEventListener('input', () => {
+            circleElement.style.borderWidth = `${borderWidthInput.value}px`;
+        });
+
+        borderColorInput.addEventListener('input', () => {
+            circleElement.style.borderColor = borderColorInput.value;
+        });
+
+        circleBackgroundInput.addEventListener('input', () => {
+            circleElement.style.background = circleBackgroundInput.value;
+        });
+
+        function downloadImage() {
+            const width = parseInt(widthInput.value, 10);
+            const height = parseInt(heightInput.value, 10);
+            const format = formatSelect.value;
+            const text = textInput.value;
+            const textColor = textColorInput.value;
+            const font = fontSelect.value;
+            const fontSize = Math.min(width, height) / 3; // Adjust font size proportionally
+            const borderWidth = parseInt(borderWidthInput.value, 10);
+            const borderColor = borderColorInput.value;
+            const circleBackground = circleBackgroundInput.value;
+
+            if (format === 'svg') {
+                downloadImageAsSVG(width, height, fontSize, text, textColor, font, borderWidth, borderColor, circleBackground);
+            } else if (format === 'png') {
+                downloadImageAsPNG(width, height, fontSize, text, textColor, font, borderWidth, borderColor, circleBackground);
+            }
+        }
+
+        function downloadImageAsSVG(width, height, fontSize, text, textColor, font, borderWidth, borderColor, circleBackground) {
+            const margin = 5; // 0.5 cm in pixels at 72 DPI
+
+            const svgNamespace = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNamespace, "svg");
+            svg.setAttribute("width", width + margin * 2);
+            svg.setAttribute("height", height + margin * 2);
+            svg.setAttribute("viewBox", `0 0 ${width + margin * 2} ${height + margin * 2}`);
+            svg.setAttribute("xmlns", svgNamespace);
+
+            const circle = document.createElementNS(svgNamespace, "circle");
+            circle.setAttribute("cx", (width + margin * 2) / 2);
+            circle.setAttribute("cy", (height + margin * 2) / 2);
+            circle.setAttribute("r", Math.min(width, height) / 2);
+            circle.setAttribute("fill", circleBackground);
+            circle.setAttribute("stroke", borderColor);
+            circle.setAttribute("stroke-width", borderWidth);
+            svg.appendChild(circle);
+
+            const textElement = document.createElementNS(svgNamespace, "text");
+            textElement.setAttribute("x", "50%");
+            textElement.setAttribute("y", "50%");
+            textElement.setAttribute("dy", ".3em");
+            textElement.setAttribute("text-anchor", "middle");
+            textElement.setAttribute("font-size", fontSize);
+            textElement.setAttribute("font-weight", "bold");
+            textElement.setAttribute("fill", textColor);
+            textElement.setAttribute("font-family", font);
+            textElement.textContent = text;
+            svg.appendChild(textElement);
+
+            const serializer = new XMLSerializer();
+            const svgData = serializer.serializeToString(svg);
+            const blob = new Blob([svgData], { type: "image/svg+xml" });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "circle_fpa.svg";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadImageAsPNG(width, height, fontSize, text, textColor, font, borderWidth, borderColor, circleBackground) {
+            const margin = 5; // 0.5 cm in pixels at 72 DPI
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width + margin * 2;
+            canvas.height = height + margin * 2;
+            const ctx = canvas.getContext('2d');
+
+            // Draw background circle
+            ctx.fillStyle = circleBackground;
+            ctx.beginPath();
+            ctx.arc(
+                (width + margin * 2) / 2,
+                (height + margin * 2) / 2,
+                Math.min(width, height) / 2,
+                0,
+                Math.PI * 2
+            );
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw border
+            ctx.strokeStyle = borderColor;
+            ctx.lineWidth = borderWidth;
+            ctx.stroke();
+
+            // Draw text
+            ctx.fillStyle = textColor;
+            ctx.font = `bold ${fontSize}px ${font}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, (width + margin * 2) / 2, (height + margin * 2) / 2);
+
+            // Convert to image and download
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'circle_fpa.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
