@@ -58,6 +58,10 @@
                     <input type="text" id="text" class="form-control" value="FPA">
                 </div>
                 <div class="col-md-6">
+                    <label for="fontSize" class="form-label">Tamanho da Fonte (px):</label>
+                    <input type="number" id="fontSize" class="form-control" value="50" min="10">
+                </div> 
+                <div class="col-md-6">
                     <label for="textColor" class="form-label">Cor do Texto:</label>
                     <input type="color" id="textColor" class="form-control form-control-color" value="#FFFFFF">
                 </div>
@@ -113,6 +117,13 @@
         const formatSelect = document.getElementById('format');
         const circleElement = document.getElementById('circle');
         const textElement = circleElement.querySelector('span');
+        const fontSizeInput = document.getElementById('fontSize');
+fontSizeInput.addEventListener('input', () => {
+    const fontSize = `${fontSizeInput.value}px`;
+    textElement.style.fontSize = fontSize;
+});
+
+
 
         widthInput.addEventListener('input', () => {
             if (keepAspectRatioCheckbox.checked) {
@@ -197,7 +208,6 @@ function downloadImageAsSVG(width, height, fontSize, text, textColor, font, bord
     URL.revokeObjectURL(url);
 }
 
-
 function downloadImageAsPNG(width, height, fontSize, text, textColor, font, borderWidth, borderColor, circleBackground) {
     const canvas = document.createElement("canvas");
     canvas.width = width;
@@ -231,6 +241,7 @@ function downloadImageAsPNG(width, height, fontSize, text, textColor, font, bord
     link.click();
     document.body.removeChild(link);
 }
+
 
 
     </script>
